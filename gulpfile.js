@@ -1,23 +1,10 @@
 var gulp         = require('gulp');
-var sass         = require('gulp-sass');
+var sass         = require('gulp-sass')(require('sass'));
 var concat       = require('gulp-concat');
 var cleanCSS     = require('gulp-clean-css');
 var minify       = require('gulp-minify');
-var gulpSequence = require('gulp-sequence');
 var bs           = require('browser-sync').create();
 var pug          = require('gulp-pug');
-
-gulp.task('default', ['css', 'js', 'pug'], function() {});
-
-gulp.task('serve', ['default', 'css:watch', 'js:watch', 'pug:watch'],function(){
-    bs.init({
-        server: {
-            baseDir: './',
-            directory: true
-        },
-    });
-    gulp.watch(['./src/style.css', './src/script.js', './src/**/*.html']).on('change', bs.reload);
-});
 
 gulp.task('scss', function() {
     return gulp.src('./src/scss/style.scss')
@@ -29,9 +16,9 @@ gulp.task('minify:css', function() {
            .pipe(cleanCSS())
            .pipe(gulp.dest('./dist/'))
 });
-gulp.task('css', gulpSequence('scss', 'minify:css'));
+gulp.task('css', gulp.series('scss', 'minify:css'));
 gulp.task('css:watch', function(){
-    gulp.watch('./src/scss/**/*.scss', ['scss']);
+    return gulp.watch('./src/scss/**/*.scss', gulp.series('scss'));
 });
 
 gulp.task('concat:js', function() {
@@ -44,9 +31,9 @@ gulp.task('minify:js', function() {
            .pipe(minify())
            .pipe(gulp.dest('./dist/'))
 });
-gulp.task('js', gulpSequence('concat:js', 'minify:js'));
+gulp.task('js', gulp.series('concat:js', 'minify:js'));
 gulp.task('js:watch', function(){
-    gulp.watch('./src/js/**/*.js', ['concat:js']);
+    return gulp.watch('./src/js/**/*.js', gulp.series('concat:js'));
 });
 
 gulp.task('pug', function(){
@@ -56,5 +43,17 @@ gulp.task('pug', function(){
            .pipe(gulp.dest('./dist/html'))
 });
 gulp.task('pug:watch', function(){
-    gulp.watch('./src/pug/**/*.pug', ['pug']);
+    return gulp.watch('./src/pug/**/*.pug', gulp.series('pug'));
 });
+
+gulp.task('default', gulp.parallel('css', 'js', 'pug'));
+
+gulp.task('serve', gulp.series('default', gulp.parallel('css:watch', 'js:watch', 'pug:watch', function(){
+    bs.init({
+        server: {
+            baseDir: './',
+            directory: true
+        },
+    });
+    return gulp.watch(['./src/style.css', './src/script.js', './src/**/*.html']).on('change', bs.reload);
+})));
