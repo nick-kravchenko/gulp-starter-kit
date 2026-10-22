@@ -4,15 +4,15 @@
   "contributors": [],
   "scripts": {},
   "private": true,
-  "dependencies": {},
   "devDependencies": {
     "browser-sync": "^3.0.4",
+    "cssnano": "^9.9.0",
     "gulp": "^5.0.1",
-    "gulp-clean-css": "^4.3.0",
-    "gulp-concat": "^2.6.1",
-    "gulp-minify": "^3.1.0",
-    "gulp-pug": "^5.0.0",
     "gulp-sass": "^6.0.1",
-    "sass": "^1.106.1"
+    "postcss": "^8.5.31",
+    "pug": "^3.0.4",
+    "sass": "^1.106.1",
+    "terser": "^5.51.2",
+    "vinyl": "^3.0.1"
   }
 }
